@@ -1,0 +1,107 @@
+.container{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+}
+
+.container__header{
+    padding:  45px 0px;
+}
+
+.container__section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container__div__1 h1{
+    font-weight: 700;
+    font-size: 48px;
+    max-width: 700px;
+    text-align: center;
+    margin: 0% 0 0px 0;
+    letter-spacing: -0.5px;
+}
+
+.container__div__1 p {
+    font-size: 18px;
+    text-align: center;
+    color: var(--medium-grey);
+    line-height: 25px;
+}
+
+.container__form input[type="text"]{
+    font-size: 2rem;
+    text-align: center;
+    padding: 0.5rem;
+    height: 72px;
+    width: 60px;
+    border: 1px solid var(--light-grey);
+}
+
+.container__form input[type="text"]:nth-child(2){   
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.container__form input[type="text"]:nth-child(4){   
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+.container__form input[type="text"]:nth-child(6){   
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.container__form input[type="text"]:nth-child(8){   
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.container__form span{
+    font-size: 25px;
+    padding: 0px 10px;
+}
+
+.container__div__2 {
+    position: absolute;
+    top: 70%;
+
+    padding: 20px;
+    text-align: center;
+}
+
+.container__div__2 p{
+    color: red;
+    border: 1px solid red;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.container__div__3 {
+    width: 50%;
+    margin: 50px 50px 5px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container__div__3 a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--light-grey);
+    font-size: 14px;
+}
+
+.container__div__3 a:hover{
+    color: var(--greeny-blue);
+    text-decoration: underline;
+}
+
+.container__div__4 p{
+    color: var(--light-grey);
+    font-size: 14px;
+}
