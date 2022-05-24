@@ -14,7 +14,7 @@ const SelectWorkspace = () => {
     },[dispatch])
 
     const workspaces = useSelector((state) => state.WorkSpaceReducer)
-    console.log(workspaces?.data)
+    // console.log(workspaces?.data)
 
     const handleSelectWorkSpace = (e) => {
         dispatch(selectWorkSpace({ workSpaceId: e.target.value, navigate }));

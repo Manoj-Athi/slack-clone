@@ -3,6 +3,7 @@ import express from 'express'
 import { createWorkSpace, fetchWorkSpace , selectWorkSpace, addUserToWorkspace} from '../controllers/workSpace.js'
 import { createNewChannel } from '../controllers/channel.js';
 import ensureAuth from '../middleware/ensureAuth.js'
+import { sendMessage, fetchMessages } from '../controllers/message.js'
 
 const router = express.Router()
 
@@ -21,6 +22,10 @@ router.post('/channel/create', ensureAuth, createNewChannel)
 // ------------ add user to new workspace ------------- //
 router.patch('/workspace/add-user', ensureAuth, addUserToWorkspace)
 
+// ------------ send message in channel ------------- //
+router.post('/message/', ensureAuth, sendMessage)
 
+// ------------ fetch all messages in a channel ------------- //
+router.get('/message/', ensureAuth, fetchMessages)
 
 export default router;

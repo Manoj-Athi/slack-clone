@@ -9,6 +9,10 @@ const ChannelSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
     latestMessage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Message'

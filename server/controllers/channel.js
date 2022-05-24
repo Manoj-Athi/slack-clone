@@ -17,6 +17,7 @@ export const createDefaultChannels = async (newWorkSpace, user) => {
     const selfChannel = await Channel.create({ 
         channelName: user?.name || user?.email.split('@')[0],
         isGroupChannel: false,
+        receiver: user?._id,
         workSpaceId : newWorkSpace._id
     })
     if( !generalChannel || !randomChannel || !selfChannel){
@@ -37,7 +38,7 @@ export const fetchCurrentChannels = async (workSpaceId) => {
 // ------------ create new channel ------------- //
 export const createNewChannel = async (req, res) => {
     const { workSpaceId, channelName, userId } = req.body;
-    console.log(workSpaceId)
+    // console.log(workSpaceId)
     try {
         if(userId !== req.user._id.toString()){
             throw new customException(401, 'Unauthorized user')

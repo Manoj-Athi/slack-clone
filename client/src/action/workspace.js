@@ -23,7 +23,7 @@ export const createWorkSpace = ({ workSpaceName, userId, navigate }) => async(di
 
 export const createChannel = ({ workSpaceId, channelName, userId, navigate }) => async(dispatch) => {
     const { data } = await axios.post('http://localhost:5000/chat/channel/create', { workSpaceId, userId, channelName }, {withCredentials: true});
-    console.log(data);
+    // console.log(data);
     dispatch({ type: "SETUP_CHANNEL", payload: data?.data });
     navigate('/create-workspace/setup-coworkers');
 }

@@ -22,7 +22,7 @@ const CreateWorkSpace = () => {
     const [ userList, setUserList ] = useState([]);
     const [ key, setKey ] = useState('');
 
-    console.log(currentWorkSpace);
+    // console.log(currentWorkSpace);
 
     const handleWorkSpace = (e) => {
         e.preventDefault();

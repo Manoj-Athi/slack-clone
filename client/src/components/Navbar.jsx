@@ -1,8 +1,15 @@
 import React from 'react'
+import userIcon from '../images/user-solid.svg';
 
-const Navbar = () => {
+const Navbar = ({ workSpaceName, userProfile }) => {
   return (
-    <div>Navbar</div>
+    <nav>
+      <h1>{ workSpaceName }</h1>
+      {/* { console.log(userProfile) } */}
+      <button type="button">
+        <img src={ userProfile?.image ? userProfile?.image : userIcon } alt="user profile" width="30"/>
+      </button>
+    </nav> 
   )
 }
 

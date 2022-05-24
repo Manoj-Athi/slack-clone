@@ -26,7 +26,7 @@ const ConfirmEmail = () => {
             setError('Enter only numbers')
             alert(error)
         }else{
-            console.log(input)
+            // console.log(input)
             setError('')
         }
     }

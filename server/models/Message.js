@@ -9,9 +9,13 @@ const MessageSchema = mongoose.Schema({
         type: String,
         trim: true
     },
-    Channel: {
+    channel: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Channel"
+    },
+    workspace: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Workspace"
     }
 },{
     timestamps: true
