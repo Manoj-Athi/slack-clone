@@ -1,14 +1,27 @@
-import { useState } from 'react'
+import { useState, useReducer } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import SetupForm from '../../components/SetupForm';
 import SetupCoworkerForm from '../../components/SetupCoworkerForm';
-import { createWorkSpace, createChannel, addCoworkerToWorkspace } from '../../action/workspace';
+import { createWorkSpace, createFirstChannel, addCoworkerToWorkspace } from '../../action/workspace';
 import axios from 'axios';
 
-const CreateWorkSpace = () => {
 
+const CreateWorkSpace = () => {
+    
+    const reducer = (state, action) => {
+        switch(action.type){
+            case "ADD_USER":
+                // const newState = state.filter(s => s._id === action.payload._id)
+                return [...state.filter(s => s._id !== action.payload._id), action.payload]
+            case "DELETE_USER":
+                return state.filter((user) => user?._id !== action.payload);
+            default :
+                return state
+        }
+    }
+    
     const { id } = useParams();
     const navigate = useNavigate();
     const user = useSelector((state) => state.UserReducer);
@@ -18,8 +31,9 @@ const CreateWorkSpace = () => {
     const [ loading, setLoading ] = useState(false);
     const [ wsName, setWsName ] = useState('');
     const [ channelName, setChannelName ] = useState('');
-    const [ coworkerList , setCoworkerList ] = useState([]);
     const [ userList, setUserList ] = useState([]);
+    const [ mainCoworkerList, setMainCoworkerList ] = useReducer(reducer, []);
+
     const [ key, setKey ] = useState('');
 
     // console.log(currentWorkSpace);
@@ -31,7 +45,10 @@ const CreateWorkSpace = () => {
 
     const handleChannel = (e) => {
         e.preventDefault();
-        dispatch(createChannel({ workSpaceId: currentWorkSpace?.data?._id ,channelName, userId: user?.data?._id, navigate }));
+        const users = currentWorkSpace?.data?.users?.map(user => user?._id)
+        const workSpaceName = currentWorkSpace?.data?.workSpaceName.replaceAll(' ', '-')
+        dispatch(createFirstChannel({ workSpaceId: currentWorkSpace?.data?._id ,channelName, userId: user?.data?._id, users, navigate, workSpaceName }));
+        // navigate(`/workspace/${workSpaceName}`);
     }
 
     const handleSearch = async (val) => {
@@ -52,14 +69,10 @@ const CreateWorkSpace = () => {
 
     } 
 
-    const handleDelete = (removeUserId) => {
-        let filteredArr = coworkerList.filter((userId) => userId !== removeUserId);
-        setCoworkerList(filteredArr)
-    }
-
-    // console.log(coworkerList);
     const addCoworkers = (e) => {
         e.preventDefault();
+        const coworkerList = mainCoworkerList.map(co => co._id)
+        // console.log(coworkerList)
         dispatch(addCoworkerToWorkspace({ workSpaceId: currentWorkSpace?.data?._id, coworkerList , navigate}))
         // let workSpaceName = currentWorkSpace?.data?.workSpaceName.replaceAll(' ', '-');
         // navigate(`/workspace/${workSpaceName}`);
@@ -71,16 +84,13 @@ const CreateWorkSpace = () => {
     } 
 
   return (
-    <div>
+    <div className='flex flex-col items-center justify-center p-12'>
         {
             id === "setup-workspace" && ( 
                 <SetupForm 
-                    title="What's the name of your company or team?"
-                    para="This will be name of your slack workspace - chose something your team will recognise"
-                    ph="Ex: Acme Marketing or Acme Co"
+                    title="Enter new work space name: "
                     changeInputVal = {setWsName}
                     handleSubmit={handleWorkSpace}
-                    skip = {false}
                 />
             )
         }
@@ -88,12 +98,9 @@ const CreateWorkSpace = () => {
         {
             id === "setup-channel" && ( 
                 <SetupForm 
-                    title="What's the current project your team is working on?"
-                    para="This will be name of your new channel"
-                    ph="Ex: Youtube Videos"
+                    title="Create a new channel: "
                     changeInputVal = {setChannelName}
                     handleSubmit={handleChannel}
-                    skip = {false}
                 />
             )
         }
@@ -101,18 +108,12 @@ const CreateWorkSpace = () => {
         {
             id === "setup-coworkers" && ( 
                 <SetupCoworkerForm 
-                    title="Who do you email most?"
-                    para="To give slack a spin - add a few coworkers you talk with regularly"
-                    ph="Ex: Elis"
-                    coworkerList = {coworkerList}
-                    setCoworkerList = {setCoworkerList}
+                    mainCoworkerList = {mainCoworkerList}
+                    setMainCoworkerList = {setMainCoworkerList}
                     addCoworkers={addCoworkers}
-                    submitVal="Add Teammates"
-                    skip={true}
                     handleSkip={handleSkip}
                     userList={userList}
                     handleSearch={handleSearch}
-                    handleDelete={handleDelete}
                 />
             )
         }

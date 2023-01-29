@@ -5,6 +5,7 @@ import cors from 'cors'
 import passport from 'passport'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
+import { Server } from "socket.io";
 // import cookieParser from 'cookie-parser'
 
 import connectDB from './config/connectDB.js'
@@ -32,9 +33,9 @@ app.use(express.json())
 app.use(cors({ origin: 'http://localhost:3000' , credentials: true }));
 
 // Iniatialize morgan
-if( process.env.NODE_ENV === 'development' ){
-    app.use(morgan('dev'))
-}
+// if( process.env.NODE_ENV === 'development' ){
+//     app.use(morgan('dev'))
+// }
 
 // Initialize session
 // app.use(cookieParser('test'))
@@ -77,7 +78,45 @@ app.use('/user', userRoutes)
 const PORT = process.env.PORT || 5001
 
 // Start the server
-app.listen(
+const server = app.listen(
     PORT, 
     console.log(`Server running with ${process.env.NODE_ENV} on port ${PORT}`)
 )
+
+const io = new Server(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: "http://localhost:3000"
+    }
+})
+
+io.on("connection", (socket) => {
+    console.log("Connected to socket.io")
+    socket.on("setup", (user) => {
+        socket.join(user._id)
+        socket.emit("connected")
+    })
+
+    socket.on("join chat", (room) => {
+        socket.join(room)
+        console.log("User joined room: ",room)
+    })
+
+    socket.on("typing", ({room, user})=>{
+        console.log({room, user})
+        socket.in(room).emit("typing", user)
+    })
+
+    socket.on("stop typing", ({ room, user })=>{
+        console.log({room, user})
+        socket.in(room).emit("stop typing", user)
+    })
+
+    socket.on("new message", (newMessage) => {
+        var channel = newMessage?.channel
+        channel?.users.forEach(user => {
+            if(user === newMessage?.sender?._id) return
+            socket.in(user).emit("message received", newMessage)
+        });
+    })
+});

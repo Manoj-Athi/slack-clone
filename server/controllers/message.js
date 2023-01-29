@@ -20,11 +20,11 @@ export const sendMessage = async (req, res) => {
 
         message = await message.populate("sender", "name image");
         message = await message.populate("channel");
-        message = await message.populate("workspace");
-        message = await User.populate(message, {
-            path: "workspace.users",
-            select: "name email image"
-        })
+        // message = await message.populate("workspace");
+        // message = await User.populate(message, {
+        //     path: "workspace.users",
+        //     select: "name email image"
+        // })
         
         await Channel.findByIdAndUpdate( req.body.channelId, {
             latestMessage: message
@@ -45,7 +45,7 @@ export const sendMessage = async (req, res) => {
 
 export const fetchMessages = async (req, res) => {
     try {
-        const messages = await Message.find({ workspace: req.query.workspaceId })
+        const messages = await Message.find({ workspace: req.query.workspaceId, channel: req.query.channelId })
             .populate("sender", "name email image")
             .populate("channel")
             .populate("workspace")

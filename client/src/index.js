@@ -7,6 +7,8 @@ import './index.css';
 import App from './App';
 import store, { persistor } from './store'
 
+// ReactDOM.createPortal()
+
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

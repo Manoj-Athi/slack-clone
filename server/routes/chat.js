@@ -1,7 +1,7 @@
 import express from 'express'
 
 import { createWorkSpace, fetchWorkSpace , selectWorkSpace, addUserToWorkspace} from '../controllers/workSpace.js'
-import { createNewChannel } from '../controllers/channel.js';
+import { createGroupChannel, createDirectChannel } from '../controllers/channel.js';
 import ensureAuth from '../middleware/ensureAuth.js'
 import { sendMessage, fetchMessages } from '../controllers/message.js'
 
@@ -17,7 +17,8 @@ router.get('/workspace/fetch-all', ensureAuth, fetchWorkSpace)
 router.post('/workspace/current', ensureAuth, selectWorkSpace)
 
 // ------------ create new channel ------------- //
-router.post('/channel/create', ensureAuth, createNewChannel)
+router.post('/channel/create', ensureAuth, createGroupChannel)
+router.post('/channel/create-direct', ensureAuth, createDirectChannel)
 
 // ------------ add user to new workspace ------------- //
 router.patch('/workspace/add-user', ensureAuth, addUserToWorkspace)

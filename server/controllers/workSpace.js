@@ -1,12 +1,11 @@
 import Workspace from "../models/Workspace.js";
 import customException from "../config/customException.js";
-import { createDefaultChannels, fetchCurrentChannels } from './channel.js'
+import { fetchCurrentChannels } from './channel.js'
 import User from "../models/User.js";
 
 // ------------ create workspace ------------- //
 export const createWorkSpace = async (req, res) => {
     const { userId, workSpaceName } = req.body;
-    // console.log(userId, workSpaceName)
     try {
         if(userId !== req.user._id.toString()){
             throw new customException(401, 'Unauthorized user')
@@ -15,12 +14,10 @@ export const createWorkSpace = async (req, res) => {
         if(!newWorkSpace){
             throw new customException(400, 'Unable to create workspace, try again later.')
         }
-        //const user = await User.findById({ _id: userId })
-        const channels = await createDefaultChannels(newWorkSpace, req.user)
         res.status(200).json({
             status: 'SUCCESS',
             message: 'Workspace created.',
-            data: { ...newWorkSpace._doc, channels: channels }
+            data: newWorkSpace
         })
     } catch (error) {
         return res.status(parseInt(error.code) || 400).json({
@@ -38,7 +35,6 @@ export const fetchWorkSpace = async (req, res) => {
         if(!allWorkspace){
             throw new customException(400, 'Unable to fetch workspace, try again later.')
         }
-        // console.log(allWorkspace)
         res.status(200).json({
             status: 'SUCCESS',
             message: 'Workspaces Fetched',
@@ -55,15 +51,14 @@ export const fetchWorkSpace = async (req, res) => {
 // ------------ select workspace ------------- //
 export const selectWorkSpace = async (req, res) => {
     const { workSpaceId } = req.body;
-    // console.log(workSpaceId)
     try {
-        const currentWorkSpace = await Workspace.findOne({ _id: workSpaceId }).populate('users').populate('workSpaceAdmin')
-        //console.log(currentWorkSpace)
+        const currentWorkSpace = await Workspace.findOne({ _id: workSpaceId })
+            .populate('users')
+            .populate('workSpaceAdmin')
         if(!currentWorkSpace){
             throw new customException(404, 'Unable to fetch workspace, try again later.')
         }
-        const channels = await fetchCurrentChannels(workSpaceId)
-        // console.log({ ...currentWorkSpace._doc, channels })
+        const channels = await fetchCurrentChannels(workSpaceId, req.user._id);
         res.status(200).json({
             status: 'SUCCESS',
             message: 'Workspaces Fetched',
@@ -84,17 +79,16 @@ export const addUserToWorkspace = async (req, res) => {
             { _id: workSpaceId, workSpaceAdmin: req.user._id }, 
             { $push: { users: { $each: coworkerList } } },
         )
-        const workSpace = await Workspace.findOne({ _id: workSpaceId}).populate('users').populate('workSpaceAdmin');
+        const workSpace = await Workspace.findOne({ _id: workSpaceId})
+            .populate('users')
+            .populate('workSpaceAdmin');
         if(!workSpace){
             throw new customException(400, 'Unable to add user to workspace');
         }
-        const channels = await fetchCurrentChannels(workSpaceId)
-        // let newWorkSpace = Object.assign(workSpace, channels);
-        // workSpace.channels = channels;
         res.status(200).json({
             status: 'SUCCESS',
             message: 'Added user to workspace',
-            data: { ...workSpace._doc, channels: channels }
+            data: workSpace
         })
     } catch (error) {
         return res.status(parseInt(error.code) || 400).json({

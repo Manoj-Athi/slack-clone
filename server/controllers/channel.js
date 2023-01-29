@@ -2,56 +2,33 @@ import Channel from "../models/Channel.js"
 
 import customException from "../config/customException.js"
 
-// ------------ create general, random, self channels ------------- //
-export const createDefaultChannels = async (newWorkSpace, user) => {
-    const generalChannel = await Channel.create({ 
-        channelName: "general",
-        isGroupChannel: true,
-        workSpaceId : newWorkSpace._id
-    })
-    const randomChannel = await Channel.create({ 
-        channelName: "random",
-        isGroupChannel: true,
-        workSpaceId : newWorkSpace._id
-    })
-    const selfChannel = await Channel.create({ 
-        channelName: user?.name || user?.email.split('@')[0],
-        isGroupChannel: false,
-        receiver: user?._id,
-        workSpaceId : newWorkSpace._id
-    })
-    if( !generalChannel || !randomChannel || !selfChannel){
-        throw new customException(400, 'Unable to create default channels')
-    }
-    return [ generalChannel, randomChannel, selfChannel ]
-}
-
 // ------------ fetch all channels ------------- //
-export const fetchCurrentChannels = async (workSpaceId) => {
-    const currentChannels = await Channel.find({ workSpaceId: { $eq: workSpaceId } })
+export const fetchCurrentChannels = async (workSpaceId, userId) => {
+    let currentChannels = await Channel.find({ workSpaceId: { $eq: workSpaceId }, users: { $all: [userId] } }).populate("users")
     if( !currentChannels ){
         throw new customException(400, 'Unable to fetch channels')
     }
     return currentChannels
 }
 
-// ------------ create new channel ------------- //
-export const createNewChannel = async (req, res) => {
-    const { workSpaceId, channelName, userId } = req.body;
-    // console.log(workSpaceId)
+// ------------ create new group channel ------------- //
+export const createGroupChannel = async (req, res) => {
+    const { workSpaceId, channelName, userId, users } = req.body;
     try {
         if(userId !== req.user._id.toString()){
             throw new customException(401, 'Unauthorized user')
         }
+        users.push(userId)
         const newChannel = await Channel.create({ 
             channelName: channelName,
             isGroupChannel: true,
-            workSpaceId : workSpaceId
+            workSpaceId : workSpaceId,
+            users: users
         })
+        // newChannel = await newChannel.populate('users')
         if( !newChannel ){
             throw new customException(400, 'Unable to fetch channels')
         }
-        // console.log(newChannel);
         res.status(200).json({
             status: 'SUCCESS',
             message: 'Channel created',
@@ -63,5 +40,43 @@ export const createNewChannel = async (req, res) => {
             message: error.message
         })
     }
+}
 
+// ------------ create new group channel ------------- //
+export const createDirectChannel = async (req, res) => {
+    const { workSpaceId, channelName, userId, users } = req.body;
+    try {
+        if(userId !== req.user._id.toString()){
+            throw new customException(401, 'Unauthorized user')
+        }
+        users.push(userId)
+        const alreadyExist = await Channel.find({ isGroupChannel: { $eq: false }, users: { $all: users } })
+        if(alreadyExist){
+            throw new customException(404, 'Channel already exist')
+        }
+        const newChannel = await Channel.create({ 
+            channelName: channelName,
+            isGroupChannel: false,
+            workSpaceId : workSpaceId,
+            users: users
+        })
+        // newChannel = await newChannel.populate('users')
+        if( !newChannel ){
+            throw new customException(400, 'Unable to fetch channels')
+        }
+        res.status(200).json({
+            status: 'SUCCESS',
+            message: 'Channel created',
+            data: newChannel
+        })
+    } catch (error) {
+        return res.status(parseInt(error.code) || 400).json({
+            status: 'ERROR',
+            message: error.message
+        })
+    }
+}
+
+export const addUsersToChannel = async (req, res) => {
+    // add user to channel
 }

@@ -1,55 +1,134 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState, useRef } from 'react'
+import { useSelector } from 'react-redux';
+import { io } from 'socket.io-client'
+import axios from 'axios';
+import Chat from './Chat'
 
-import { sendMessage } from '../action/messages';
-import { fetchAllMessages } from '../action/messages';
+const ENDPOINT = "http://localhost:5000"
 
-const ChatContainer = ({ currentChat }) => {
+// import { sendMessage } from '../action/messages';
+// import { fetchAllMessages } from '../action/messages';
 
-  const [ message, setMessage ] = useState('');
-  const dispatch = useDispatch();
-  const workspace = useSelector((state) => (state.CurrentWorkSpaceReducer))
-  // console.log(workspace)
-  const messages = useSelector((state) => state.MessagesReducer)
-  // console.log(messages)
+const ChatContainer = ({ currentChat, userProfile }) => {
   
-  const handleSendMessage = (e) => {
-    setMessage(e.target.value)
-    if(e.key === "Enter" && message){
-      dispatch(sendMessage({ messageContent: message, channelId: currentChat._id, workSpaceId: workspace?.data?._id }))
-      setMessage("")
+  const socket = useRef(null)
+  const  selectedChat = useRef(null)
+  const [ message, setMessage ] = useState('');
+  const [ allMessages, setAllMessages ] = useState('');
+  const [ socketConnected, setSocketConnected] = useState(false)
+  const [ typing, setTyping] = useState(false)
+  const [ isOthersTyping, setIsOthersTyping] = useState(false)
+  const [usersTyping, setUsersTyping] = useState([])
+  // console.log(allMessages)
+  const [ loading, setLoading ] = useState('');
+  const workspace = useSelector((state) => (state.CurrentWorkSpaceReducer))
+  // const dispatch = useDispatch();
+  // console.log(workspace)
+  // const messages = useSelector((state) => state.MessagesReducer)
+  // console.log(currentChat)
+  
+  useEffect(() => {
+    socket.current = io(ENDPOINT)
+    socket.current.emit("setup", userProfile)
+    socket.current.on("connected", () => setSocketConnected(true))
+    socket.current.on("typing", (user) => {
+      if(user._id !== userProfile?._id){
+        console.log(user._id)
+        console.log(userProfile._id)
+        setUsersTyping([...usersTyping, user])
+      } 
+    })
+    socket.current.on("stop typing", (user)=> {
+      console.log(user)
+      setUsersTyping(usersTyping.filter(u => u?._id === user._id))
+    })
+  }, [])
+  
+  const fetchAllMessages = async () => {
+    if(!currentChat) return
+    setLoading(true)
+    try {
+      const { data } = await axios.get(`http://localhost:5000/chat/message?workspaceId=${workspace?.data?._id}&channelId=${currentChat._id}`, {withCredentials: true})
+      setAllMessages(data?.data)
+      setLoading(false)
+      socket.current.emit("join chat", currentChat._id)
+    } catch (error) {
+      console.log(error)
     }
   }
 
   useEffect(() => {
-    dispatch(fetchAllMessages({ workSpaceId: workspace?.data?._id }))
-  }, [dispatch])
+    fetchAllMessages()
+    selectedChat.current = currentChat;
+  }, [currentChat])
+
+  useEffect(() => {
+    socket.current.on("message received", (newMessage) => {
+      if(!selectedChat.current || selectedChat.current?._id !== newMessage?.channel?._id){
+        //
+      }else{
+        setAllMessages([...allMessages, newMessage])
+      }
+    })
+  })
+
+  const handleSendMessage = async () => {
+    // setMessage(e.target.value)
+    // console.log(message)
+    if(!currentChat) return
+    setTyping(false)
+    socket.current.emit("stop typing", { room: currentChat, user: userProfile})
+    try {
+      if(message){
+        const { data } = await axios.post('http://localhost:5000/chat/message', { messageContent: message, channelId: currentChat._id, workSpaceId: workspace?.data?._id }, {withCredentials: true})
+        // console.log(data?.data)
+        setAllMessages([...allMessages, data?.data])
+        setMessage("")
+        socket.current.emit("new message", data?.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleTypingCancel = () => {
+    if(typing){
+      socket.current.emit("stop typing", currentChat._id)
+      setTyping(false)
+    }
+  }
+
+  const handleTyping = (e) => {
+    // setMessage(e.target.value)
+    if(!socketConnected) return
+    if(!typing){
+      setTyping(true)
+      socket.current.emit("typing", { room: currentChat._id, user:userProfile })
+    }
+    var lastTyping = new Date().getTime()
+    var timeout = 3000;
+    setTimeout(()=>{
+      var timeNow = new Date().getTime()
+      var timeDiff = timeNow - lastTyping
+      if(timeDiff >= timeout && typing){
+        socket.current.emit("stop typing", { room: currentChat._id, user:userProfile })
+        setTyping(false)
+      }
+    }, timeout)
+  }
 
   return (
-    <>
+    <div className='flex flex-col flex-auto h-full p-6'>
       {
         currentChat ? (
-          <div>
-            <h1>
-              { currentChat?.channelName }
-            </h1>
-            <div>
-              {
-                messages && messages.filter((message) => message?.channel?._id === currentChat._id).map((message) => (
-                  <div key={message?._id}>
-                    <p>{message?.sender?.name || message?.sender?.email}</p>
-                    <p>{message?.content}</p>
-                  </div>
-                ))
-              }
-            </div>
-            <input type="text" placeholder='message' value={message} onChange={(e) => setMessage(e.target.value)} onKeyPress={handleSendMessage}/>
-          </div>
+          <Chat userProfile={userProfile} loading={loading} allMessages={allMessages} currentChat={currentChat} 
+          message={message} setMessage={setMessage} handleTyping={handleTyping} handleSendMessage={handleSendMessage} 
+          isOthersTyping={isOthersTyping} handleTypingCancel={handleTypingCancel} usersTyping={usersTyping}/>
         ) : (
-          <h1>No chats</h1>
+          <div></div>
         )
       }
-    </>
+    </div>
   )
 }
 
