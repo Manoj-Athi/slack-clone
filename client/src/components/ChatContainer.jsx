@@ -12,12 +12,11 @@ const ENDPOINT = "http://localhost:5000"
 const ChatContainer = ({ currentChat, userProfile }) => {
   
   const socket = useRef(null)
-  const  selectedChat = useRef(null)
+  const selectedChat = useRef(null)
   const [ message, setMessage ] = useState('');
   const [ allMessages, setAllMessages ] = useState('');
   const [ socketConnected, setSocketConnected] = useState(false)
   const [ typing, setTyping] = useState(false)
-  const [ isOthersTyping, setIsOthersTyping] = useState(false)
   const [usersTyping, setUsersTyping] = useState([])
   // console.log(allMessages)
   const [ loading, setLoading ] = useState('');
@@ -33,13 +32,10 @@ const ChatContainer = ({ currentChat, userProfile }) => {
     socket.current.on("connected", () => setSocketConnected(true))
     socket.current.on("typing", (user) => {
       if(user._id !== userProfile?._id){
-        console.log(user._id)
-        console.log(userProfile._id)
-        setUsersTyping([...usersTyping, user])
+        setUsersTyping((state) => !state.find(element => element._id === user._id) ? [...state, user] : [...state])
       } 
     })
     socket.current.on("stop typing", (user)=> {
-      console.log(user)
       setUsersTyping(usersTyping.filter(u => u?._id === user._id))
     })
   }, [])
@@ -65,7 +61,7 @@ const ChatContainer = ({ currentChat, userProfile }) => {
   useEffect(() => {
     socket.current.on("message received", (newMessage) => {
       if(!selectedChat.current || selectedChat.current?._id !== newMessage?.channel?._id){
-        //
+        // @TODO: handle notifications
       }else{
         setAllMessages([...allMessages, newMessage])
       }
@@ -77,7 +73,7 @@ const ChatContainer = ({ currentChat, userProfile }) => {
     // console.log(message)
     if(!currentChat) return
     setTyping(false)
-    socket.current.emit("stop typing", { room: currentChat, user: userProfile})
+    socket.current.emit("stop typing", { room: currentChat?._id, user: userProfile})
     try {
       if(message){
         const { data } = await axios.post('http://localhost:5000/chat/message', { messageContent: message, channelId: currentChat._id, workSpaceId: workspace?.data?._id }, {withCredentials: true})
@@ -91,13 +87,6 @@ const ChatContainer = ({ currentChat, userProfile }) => {
     }
   }
 
-  const handleTypingCancel = () => {
-    if(typing){
-      socket.current.emit("stop typing", currentChat._id)
-      setTyping(false)
-    }
-  }
-
   const handleTyping = (e) => {
     // setMessage(e.target.value)
     if(!socketConnected) return
@@ -106,7 +95,7 @@ const ChatContainer = ({ currentChat, userProfile }) => {
       socket.current.emit("typing", { room: currentChat._id, user:userProfile })
     }
     var lastTyping = new Date().getTime()
-    var timeout = 3000;
+    var timeout = 10000;
     setTimeout(()=>{
       var timeNow = new Date().getTime()
       var timeDiff = timeNow - lastTyping
@@ -123,7 +112,7 @@ const ChatContainer = ({ currentChat, userProfile }) => {
         currentChat ? (
           <Chat userProfile={userProfile} loading={loading} allMessages={allMessages} currentChat={currentChat} 
           message={message} setMessage={setMessage} handleTyping={handleTyping} handleSendMessage={handleSendMessage} 
-          isOthersTyping={isOthersTyping} handleTypingCancel={handleTypingCancel} usersTyping={usersTyping}/>
+          usersTyping={usersTyping}/>
         ) : (
           <div></div>
         )

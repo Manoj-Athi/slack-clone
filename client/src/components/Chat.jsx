@@ -4,8 +4,8 @@ import sliders from '../images/sliders-solid.svg'
 import emoji from '../images/face-smile-solid.svg'
 import send from '../images/share-solid.svg'
 import attach from '../images/paperclip-solid.svg'
-import spinner from '../images/spinner-solid.svg'
-import typingLoader from '../images/typing-loader.png'
+import ClipLoader from "react-spinners/ClipLoader";
+import BeatLoader from "react-spinners/BeatLoader";
 
 const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyping, handleSendMessage, userProfile, isOthersTyping, handleTypingCancel, usersTyping }) => {
     // console.log(userProfile)
@@ -22,14 +22,14 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
 
     useEffect(()=>{
         lastMessageRef.current?.scrollIntoView()
-    }, [allMessages])
+    }, [allMessages, usersTyping])
 
   return (
     <div>
         { 
             loading ? 
-            <div className='h-[calc(100vh_-_100px)] w-full animate-spin flex items-center justify-center'>
-                <img src={spinner} alt="" width="30"/>
+            <div className='h-[calc(100vh_-_110px)] w-full flex items-center justify-center'>
+                <ClipLoader color="#000000" />
             </div>
             : 
             <div className='flex flex-col rounded-2xl bg-white h-[calc(100vh_-_106px)] p-4 overflow-x-hidden'>
@@ -60,19 +60,20 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                             </div>
                         ))
                     }
-                    {/* <img src={typingLoader} alt="" className='w-20 h-20'/> */}
-                    <div>
-                        { 
+                    <div className='mt-1'>
+                        {
                             usersTyping.length !== 0 && usersTyping.map((user) => (
                                 <div key={user._id} className="flex py-1 items-center">
                                     {(user?.image.length !== 0) ? (
-                                        <img src={user.image} alt="" className='rounded-full h-8 w-8'/>
+                                        <img src={user.image} alt="" className='rounded-full h-10 w-10'/>
                                     ) : (
                                         <div className='px-3 py-2 bg-[#4a154be6] rounded-full'>
                                             <p className='capitalize text-white'>{user.name[0] || user.email[0]}</p>
                                         </div>
                                     )}
-                                    <img src={typingLoader} alt="" className='w-20 h-20'/>
+                                    <div className='ml-[20px]'>
+                                        <BeatLoader color="#000000" size={10}/>
+                                    </div>
                                 </div>
                             ))
                         }

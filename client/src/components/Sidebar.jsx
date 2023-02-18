@@ -37,10 +37,8 @@ const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
       })
   }
 
-  // console.log(workSpace)
-
   return (
-    <div className={` md:translate-x-0 md:static z-10 translate-x-[${slideIn}] absolute flex h-[calc(100vh_-_58px)] w-[14rem] flex-col space-y-2 border-r-2 border-gray-200 bg-[#4a154be6] text-white p-4 transition`}>
+    <div className={`absolute translate-x-[${slideIn?"-100%":"0%"}] md:static md:translate-x-0 z-10 flex h-[calc(100vh_-_58px)] w-[14rem] flex-col space-y-2 border-r-2 border-gray-200 bg-[#4a154b] text-white p-4 transition`}>
       <h1 className='font-semibold text-2xl capitalize'>
         {workSpace?.workSpaceName}
       </h1>

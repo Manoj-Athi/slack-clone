@@ -1,5 +1,4 @@
 import Channel from "../models/Channel.js"
-
 import customException from "../config/customException.js"
 
 // ------------ fetch all channels ------------- //

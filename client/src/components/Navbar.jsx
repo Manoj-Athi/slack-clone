@@ -2,24 +2,16 @@ import React, {useState} from 'react'
 import userIcon from '../images/user-solid.svg';
 import hamburgerIcon from '../images/bars-solid.svg'
 
-const Navbar = ({ workSpaceName, userProfile, handleLogout, setSlideIn }) => {
+const Navbar = ({ workSpaceName, userProfile, handleLogout, handleSlideIn }) => {
 
   const [show, setShow] = useState(() => false)
-
-  const asignVal = (state) =>{
-    if(state === "0%"){
-      return "-100%"
-    }else{
-      return "0%"
-    }
-  } 
 
   return (
     <nav className="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 py-2 ">
       <div className='flex items-center space-x-2'>
-        <div onClick={() => setSlideIn(asignVal)}>
+        <button onClick={handleSlideIn}>
           <img src={ hamburgerIcon } alt="hamburger icon" className="md:hidden h-5 w-5 cursor-pointer"/>
-        </div>
+        </button>
         <h1 className='font-bold text-2xl text-[#4a154be6]'>Chat App</h1>
       </div>
       <div>

@@ -24,7 +24,7 @@ const WorkSpace = () => {
   const navigate = useNavigate();
   const currentWorkSpace = useSelector((state) => state.CurrentWorkSpaceReducer);
   const user = useSelector((state) => state.UserReducer);
-  const [slideIn, setSlideIn] = useState(() => "-100%")
+  const [slideIn, setSlideIn] = useState(false)
   const dispatch = useDispatch()
 
   const [ ModalState, setModalState ] = useReducer(modalReducer, { show: false });
@@ -35,6 +35,11 @@ const WorkSpace = () => {
       navigate('/')
     }
   }
+
+  const handleSlideIn = () => {
+    setSlideIn( (state) => !state )
+  }
+  // console.log(slideIn)
   
   useEffect(() => {
     dispatch(selectWorkSpace({ workSpaceId: currentWorkSpace?.data?._id }))
@@ -44,7 +49,7 @@ const WorkSpace = () => {
     <ModalContext.Provider value={ { ModalState, setModalState } }>
       <div className="min-h-screen w-full bg-gray-100 text-gray-700" x-data="layout">
         <ModalForm {...ModalState} setModalState={setModalState} usersList={currentWorkSpace?.data?.users} workSpaceId={currentWorkSpace?.data?._id} cur={user?.data}/>
-        <Navbar workSpaceName={currentWorkSpace?.data?.workSpaceName} setSlideIn={setSlideIn} userProfile={user?.data} handleLogout={handleLogout}/>
+        <Navbar workSpaceName={currentWorkSpace?.data?.workSpaceName} handleSlideIn={handleSlideIn} userProfile={user?.data} handleLogout={handleLogout}/>
         <div className='flex'>
           <Sidebar workSpace={currentWorkSpace?.data} setCurrentChat={setCurrentChat} slideIn={slideIn} />
           <ChatContainer currentChat={currentChat} userProfile={user?.data}/>
