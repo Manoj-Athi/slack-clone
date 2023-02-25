@@ -3,7 +3,7 @@ import express from 'express'
 import { createWorkSpace, fetchWorkSpace , selectWorkSpace, addUserToWorkspace} from '../controllers/workSpace.js'
 import { createGroupChannel, createDirectChannel } from '../controllers/channel.js';
 import ensureAuth from '../middleware/ensureAuth.js'
-import { sendMessage, fetchMessages } from '../controllers/message.js'
+import { sendMessage, fetchMessages, fetchAllUnreadMessages , setMessageRead} from '../controllers/message.js'
 
 const router = express.Router()
 
@@ -28,5 +28,11 @@ router.post('/message/', ensureAuth, sendMessage)
 
 // ------------ fetch all messages in a channel ------------- //
 router.get('/message/', ensureAuth, fetchMessages)
+// ------------ mark messages read in a workspaces ------------- //
+router.post('/read', ensureAuth, setMessageRead)
+
+// ------------ fetch all unread messages in a workspaces ------------- //
+router.get('/unread-message/', ensureAuth, fetchAllUnreadMessages)
+
 
 export default router;

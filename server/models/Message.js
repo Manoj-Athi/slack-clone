@@ -9,6 +9,10 @@ const MessageSchema = mongoose.Schema({
         type: String,
         trim: true
     },
+    isRead: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+    }],
     channel: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Channel"

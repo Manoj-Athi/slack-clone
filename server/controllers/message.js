@@ -16,6 +16,7 @@ export const sendMessage = async (req, res) => {
             content: messageContent,
             channel: channelId,
             workspace: workSpaceId,
+            isRead: []
         });
 
         message = await message.populate("sender", "name image");
@@ -54,6 +55,49 @@ export const fetchMessages = async (req, res) => {
             status: 'SUCCESS',
             message: 'messages fetched.',
             data: messages
+        })
+    } catch (error) {
+        return res.status(parseInt(error.code) || 400).json({
+            status: 'ERROR',
+            message: error.message
+        })
+    }
+}
+
+export const fetchAllUnreadMessages = async (req, res) => {
+    try {
+        const messages = await Message.find({ workspace: req.query.workspaceId, isRead: { $nin: [req.user._id] } , sender: { $ne: req.user._id } })
+            .populate("sender", "name email image")
+            .populate("channel")
+            .populate("workspace")
+            .sort({ "createdAt": -1 })
+        // console.log(messages)
+
+        res.status(200).json({
+            status: 'SUCCESS',
+            message: 'messages fetched.',
+            data: messages
+        })
+    } catch (error) {
+        return res.status(parseInt(error.code) || 400).json({
+            status: 'ERROR',
+            message: error.message
+        })
+    }
+}
+
+export const setMessageRead = async (req, res) => {
+    try {
+        const data = await Message.updateOne({
+            _id: req.body.messageId
+        },{
+            $push: { isRead: req.user._id } 
+        })
+        console.log(data)
+
+        res.status(200).json({
+            status: 'SUCCESS',
+            message: 'marked read'
         })
     } catch (error) {
         return res.status(parseInt(error.code) || 400).json({

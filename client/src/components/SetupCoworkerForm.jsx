@@ -2,7 +2,7 @@ import React from 'react'
 import DisplayUserList from './DisplayUserList'
 import DisplayCoworkerList from './DisplayCoworkerList'
 
-const SetupCoworkerForm = ({ addCoworkers, mainCoworkerList, setMainCoworkerList, handleSkip, userList, handleSearch }) => {
+const SetupCoworkerForm = ({ addCoworkers, mainCoworkerList, setMainCoworkerList, handleSkip, userList, handleSearch, loading }) => {
   return (
     <form onSubmit={addCoworkers} className="mx-auto w-full max-w-[500px]">
         <label htmlFor="">
@@ -24,9 +24,13 @@ const SetupCoworkerForm = ({ addCoworkers, mainCoworkerList, setMainCoworkerList
         </div>
         <div className='py-3'>
           {
-            userList.length !==0 && userList.map(user => (
-              <DisplayUserList key={user._id} user={user} setMainCoworkerList={setMainCoworkerList}/>
-            ))
+            loading ? (
+              <p>Loading...</p> 
+            ) : (
+              userList.length !==0 && userList.map(user => (
+                <DisplayUserList key={user._id} user={user} setMainCoworkerList={setMainCoworkerList}/>
+              ))
+            )
           }
         </div>
     </form>

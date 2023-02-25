@@ -93,7 +93,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("Connected to socket.io")
     socket.on("setup", (user) => {
-        socket.join(user._id)
+        socket.join(user?._id)
         socket.emit("connected")
     })
 
@@ -118,5 +118,10 @@ io.on("connection", (socket) => {
     socket.on("stop typing", ({ room, user })=>{
         // console.log({room, user})
         socket.in(room).emit("stop typing", user)
+    })
+
+    socket.off("setup", () => {
+        console.log("User Disconnected");
+        socket.leave(user._id)
     })
 });

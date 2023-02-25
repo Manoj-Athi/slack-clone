@@ -7,20 +7,19 @@ import SetupCoworkerForm from '../../components/SetupCoworkerForm';
 import { createWorkSpace, createFirstChannel, addCoworkerToWorkspace } from '../../action/workspace';
 import axios from 'axios';
 
+const reducer = (state, action) => {
+    switch(action.type){
+        case "ADD_USER":
+            // const newState = state.filter(s => s._id === action.payload._id)
+            return [...state.filter(s => s._id !== action.payload._id), action.payload]
+        case "DELETE_USER":
+            return state.filter((user) => user?._id !== action.payload);
+        default :
+            return state
+    }
+}
 
 const CreateWorkSpace = () => {
-    
-    const reducer = (state, action) => {
-        switch(action.type){
-            case "ADD_USER":
-                // const newState = state.filter(s => s._id === action.payload._id)
-                return [...state.filter(s => s._id !== action.payload._id), action.payload]
-            case "DELETE_USER":
-                return state.filter((user) => user?._id !== action.payload);
-            default :
-                return state
-        }
-    }
     
     const { id } = useParams();
     const navigate = useNavigate();
@@ -72,10 +71,7 @@ const CreateWorkSpace = () => {
     const addCoworkers = (e) => {
         e.preventDefault();
         const coworkerList = mainCoworkerList.map(co => co._id)
-        // console.log(coworkerList)
         dispatch(addCoworkerToWorkspace({ workSpaceId: currentWorkSpace?.data?._id, coworkerList , navigate}))
-        // let workSpaceName = currentWorkSpace?.data?.workSpaceName.replaceAll(' ', '-');
-        // navigate(`/workspace/${workSpaceName}`);
     }
 
     const handleSkip = () => {
@@ -114,6 +110,7 @@ const CreateWorkSpace = () => {
                     handleSkip={handleSkip}
                     userList={userList}
                     handleSearch={handleSearch}
+                    loading={loading}
                 />
             )
         }

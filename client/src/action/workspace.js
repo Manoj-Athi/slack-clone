@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { fetchAllUnreadMessages } from './messages';
 
 export const fetchWorkSpace = () => async (dispatch) => {
     const { data } = await axios.get('http://localhost:5000/chat/workspace/fetch-all', {withCredentials: true});
@@ -10,6 +11,7 @@ export const selectWorkSpace = ({ workSpaceId, navigate }) => async(dispatch) =>
     dispatch({ type: "CURRENT_WORKSPACE", payload: data?.data });
     let workSpaceName = data?.data?.workSpaceName.replaceAll(' ', '-');
     navigate && navigate(`/workspace/${workSpaceName}`);
+    dispatch(fetchAllUnreadMessages({workSpaceId}))
 }
 
 export const createWorkSpace = ({ workSpaceName, userId, navigate }) => async(dispatch) => {

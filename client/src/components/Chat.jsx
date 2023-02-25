@@ -10,6 +10,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyping, handleSendMessage, userProfile, isOthersTyping, handleTypingCancel, usersTyping }) => {
     // console.log(userProfile)
     // console.log(allMessages)
+    
     const lastMessageRef = useRef(null)
 
     const isLastMsg = (message, index, allMessages) => {
@@ -18,6 +19,10 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
 
     const isSender = (msg) => {
         return msg.sender._id !== userProfile?._id
+    }
+
+    const isLastMsgByUser = (msg, index, allMessages) => {
+        return index === allMessages.length-1 && msg?.sender?._id === userProfile?._id
     }
 
     useEffect(()=>{
@@ -54,9 +59,14 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                                         </div>
                                     ))
                                 }
-                                <div className={`px-4 py-2 rounded-full bg-gray-200 mx-3 ${ isSender(m) && ( !isLastMsg(m, index, allMessages) ? "bg-[#f9ebfa] ml-[50px]" : "bg-[#f9ebfa]")} `}>
+                                <div className={`px-4 py-2 rounded-lg whitespace-pre-line bg-gray-200 mx-3 ${ isSender(m) && ( !isLastMsg(m, index, allMessages) ? "bg-[#f9ebfa] ml-[50px]" : "bg-[#f9ebfa]")} `}>
                                     <p>{m?.content}</p>
                                 </div>
+                                {
+                                    (isLastMsgByUser(m, index, allMessages) && m?.isRead &&  m?.isRead.length !== 0) && (
+                                        <p className='text-xs'>{ m?.channel.isGroupChannel ? `Seen by ${m?.isRead.length}` : "Seen" }</p>
+                                    )
+                                }
                             </div>
                         ))
                     }
@@ -87,7 +97,7 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                     <button className='hover:bg-gray-300 sm:p-3 p-1 mr-2 rounded-full transition'>
                         <img src={emoji} alt="" className='w-5 h-5'/>
                     </button>
-                    <textarea className="w-full h-10 p-2" type="text" placeholder='message' value={message} onChange={(e) => setMessage(e.target.value)} onKeyPress={handleTyping}/>
+                    <textarea className="w-full h-10 p-2 resize-none" type="text" placeholder='message' value={message} onChange={(e) => setMessage(e.target.value)} onKeyPress={handleTyping}/>
                     <button className='hover:bg-gray-300 sm:p-3 p-1 mx-1 mr-2 rounded-full transition' onClick={handleSendMessage}>
                         <img src={send} alt="" className='w-5 h-5'/>
                     </button>

@@ -30,6 +30,9 @@ const ModalForm = ({show, title, isGroupChannel, setModalState, usersList, cur, 
   }
 
   const handleCancel = () => {
+    setChannelName('')
+    setUsers({type:"EMPTY_USERS"})
+    setNewUserList([])
     setModalState(
       { 
         type: "SET_MODAL_DATA", 
@@ -37,6 +40,7 @@ const ModalForm = ({show, title, isGroupChannel, setModalState, usersList, cur, 
            show:false,
         }
       })
+    
   }
 
   const handleSearch = (val) => {
