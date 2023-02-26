@@ -1,4 +1,5 @@
 import React, {useRef, useEffect} from 'react'
+import moment from 'moment';
 
 import sliders from '../images/sliders-solid.svg'
 import emoji from '../images/face-smile-solid.svg'
@@ -21,8 +22,16 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
         return msg.sender._id !== userProfile?._id
     }
 
-    const isLastMsgByUser = (msg, index, allMessages) => {
-        return index === allMessages.length-1 && msg?.sender?._id === userProfile?._id
+    const isSendByUser = (msg) => {
+        return msg.sender._id === userProfile?._id
+    } 
+
+    const isFirstMsgOfDate = (msg, index, allMessages) => {
+        return index===0 || moment(msg.createdAt).format('ll') !== moment(allMessages[index-1].createdAt).format('ll')
+    }
+
+    const isReadByAll = (msg) => {
+        return typeof msg.isRead === "object" && msg.channel.users.length === msg.isRead.length
     }
 
     useEffect(()=>{
@@ -49,24 +58,40 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                 <div className='px-5 py-4  h-[calc(100vh_-_250px)] flex flex-col overflow-y-scroll scroll-smooth'>
                     {
                         allMessages && allMessages.filter((messages) => messages?.channel?._id === currentChat._id).map((m, index) => (
-                            <div key={m?._id} className={`flex py-1 items-center ${ !isSender(m) && "flex-row-reverse" }`}>
+                            <div key={m?._id}>
                                 {
-                                    isSender(m) && isLastMsg(m, index, allMessages) && (( m?.sender?.image.length !== 0) ? (
-                                        <img src={m.sender.image} alt="" className='rounded-full h-10 w-10'/>
-                                    ) : (
-                                        <div className='px-3 py-2 bg-[#4a154be6] rounded-full'>
-                                            <p className='capitalize text-white'>{m?.sender?.name[0] || m?.sender?.email[0]}</p>
+                                    isFirstMsgOfDate(m, index, allMessages) && (
+                                        <div className='flex justify-start items-center my-2'>
+                                            <hr className='grow'/>
+                                            <p className='mx-2 flex'>{moment(m?.createdAt).format('ll')}</p>
+                                            <hr className='grow'/>
                                         </div>
-                                    ))
-                                }
-                                <div className={`px-4 py-2 rounded-lg whitespace-pre-line bg-gray-200 mx-3 ${ isSender(m) && ( !isLastMsg(m, index, allMessages) ? "bg-[#f9ebfa] ml-[50px]" : "bg-[#f9ebfa]")} `}>
-                                    <p>{m?.content}</p>
-                                </div>
-                                {
-                                    (isLastMsgByUser(m, index, allMessages) && m?.isRead &&  m?.isRead.length !== 0) && (
-                                        <p className='text-xs'>{ m?.channel.isGroupChannel ? `Seen by ${m?.isRead.length}` : "Seen" }</p>
                                     )
                                 }
+                                <div className={`flex py-1 items-center ${ !isSender(m) && "flex-row-reverse" }`}>
+                                    {
+                                        isSender(m) && isLastMsg(m, index, allMessages) && (( m?.sender?.image.length !== 0) ? (
+                                            <img src={m.sender.image} alt="" className='rounded-full h-10 w-10'/>
+                                        ) : (
+                                            <div className='px-3 py-2 bg-[#4a154be6] rounded-full'>
+                                                <p className='capitalize text-white'>{m?.sender?.name[0] || m?.sender?.email[0]}</p>
+                                            </div>
+                                        ))
+                                    }
+                                    <div type="button" className={`group relative flex flex-col px-4 py-2 rounded-lg whitespace-pre-line bg-gray-200 mx-3 ${ isSender(m) && ( !isLastMsg(m, index, allMessages) ? "bg-[#f9ebfa] ml-[50px]" : "bg-[#f9ebfa]")} `}>
+                                        <p>{m?.content}</p>
+                                        <div className='text-xs flex justify-end'>
+                                            <p>{moment(m?.createdAt).format('LT').toLocaleLowerCase()}</p>
+                                        </div>
+                                        {
+                                            isSendByUser(m) && (
+                                                <span class="absolute top-[-35px] left-0 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+                                                    seen by {typeof m.isRead === "object" && m.isRead.length}
+                                                </span>
+                                            )
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         ))
                     }
