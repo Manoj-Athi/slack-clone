@@ -38,7 +38,7 @@ const Navbar = ({ workSpaceName, userProfile, handleLogout, handleSlideIn, setCu
         </Badge>
         {
           notifyShow && (
-            <div className="absolute right-16 top-12 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
+            <div className="absolute z-30 right-16 top-12 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
               {
                 notification.length === 0 ? (
                   <div className="flex flex-col">
@@ -79,7 +79,7 @@ const Navbar = ({ workSpaceName, userProfile, handleLogout, handleSlideIn, setCu
         </button>
         {
           profileShow && (
-            <div className="absolute right-2 top-12 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
+            <div className="absolute z-30 right-2 top-12 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
               <div className="flex items-center space-x-2 p-2">
                   <img src={ userProfile.image.length !==0 ? userProfile.image : userIcon } alt="user" className="h-9 w-9 rounded-full" />
                   <div className="font-medium">{userProfile?.name}</div>

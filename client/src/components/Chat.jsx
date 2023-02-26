@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState} from 'react'
 import moment from 'moment';
 
 import sliders from '../images/sliders-solid.svg'
@@ -7,12 +7,17 @@ import send from '../images/share-solid.svg'
 import attach from '../images/paperclip-solid.svg'
 import ClipLoader from "react-spinners/ClipLoader";
 import BeatLoader from "react-spinners/BeatLoader";
+import ChannelDesc from "./ChannelDesc";
+import ChannelEdit from './ChannelEdit';
+import ChannelDelete from './ChannelDelete';
 
-const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyping, handleSendMessage, userProfile, isOthersTyping, handleTypingCancel, usersTyping }) => {
-    // console.log(userProfile)
-    // console.log(allMessages)
+const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyping, handleSendMessage, userProfile, usersTyping }) => {
     
     const lastMessageRef = useRef(null)
+    const [showSettings, setShowSettings] = useState(false)
+    const [showViewDesc, setShowViewDesc] = useState(false)
+    const [showEdit, setShowEdit] = useState(false)
+    const [showDelete, setShowDelete] = useState(false)
 
     const isLastMsg = (message, index, allMessages) => {
         return (index < allMessages.length && message.sender._id !== allMessages[index+1]?.sender._id)
@@ -28,10 +33,6 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
 
     const isFirstMsgOfDate = (msg, index, allMessages) => {
         return index===0 || moment(msg.createdAt).format('ll') !== moment(allMessages[index-1].createdAt).format('ll')
-    }
-
-    const isReadByAll = (msg) => {
-        return typeof msg.isRead === "object" && msg.channel.users.length === msg.isRead.length
     }
 
     useEffect(()=>{
@@ -51,9 +52,23 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                     <h1 className="font-bold text-2xl capitalize">
                         { currentChat?.channelName }
                     </h1>
-                    <button className='hover:bg-gray-300 p-3 rounded-full transition'>
+                    <button onClick={() => setShowSettings(state => !state)} className='hover:bg-gray-300 p-3 rounded-full transition'>
                         <img src={sliders} alt="" className='text-gray-400 h-4 w-4'/>
                     </button>
+                    {
+                        showSettings && (
+                            <div className="absolute z-20 right-12 top-36 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
+                                <div className="flex flex-col">
+                                    <button onClick={() => setShowViewDesc(state => !state)} className='cursor-pointer transition hover:bg-[#f9ebfa] hover:border-[#4a154be6] hover:text-[#4a154be6] p-2'>{ currentChat?.isGroupChannel ? "View Channel Details" : "View Profile" }</button>
+                                    { currentChat?.isGroupChannel && <button onClick={() => setShowEdit(state => !state)} className='cursor-pointer transition hover:bg-[#f9ebfa] hover:border-[#4a154be6] hover:text-[#4a154be6] p-2'>Edit Channel</button> }
+                                    <button onClick={() => setShowDelete(state => !state)} className='cursor-pointer transition hover:bg-red-100 hover:border-red-600 hover:text-red-600 p-2'>Delete Channel</button>
+                                </div>
+                            </div>
+                        )
+                    }
+                    { showViewDesc && <ChannelDesc currentChat={currentChat} setShowViewDesc={setShowViewDesc} setShowEdit={setShowEdit} setShowDelete={setShowDelete}/>}
+                    { showEdit && <ChannelEdit currentChat={currentChat} setShowEdit={setShowEdit}/>}
+                    { showDelete && <ChannelDelete currentChat={currentChat} setShowDelete={setShowDelete}/>}
                 </div>
                 <div className='px-5 py-4  h-[calc(100vh_-_250px)] flex flex-col overflow-y-scroll scroll-smooth'>
                     {

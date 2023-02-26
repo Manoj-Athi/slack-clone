@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 // import { useSelector } from 'react-redux';
 import { ModalContext } from "../Contexts/ModalContext";
-
 import arrowDown from "../images/caret-down-solid.svg";
 
 const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
@@ -10,7 +9,6 @@ const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
   const { setModalState } = useContext(ModalContext);
 
   // const user = useSelector((state) => state.UserReducer)
-
   const handleModal = () => {
     setModalState({
       type: "SET_MODAL_DATA",
@@ -75,13 +73,6 @@ const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
             Add Channels
           </button>
         </div>
-        {/* {
-            popupChannel &&  (
-              <ModalForm channelName={channelName} setChannelName={setChannelName} searchVal={searchVal} setSearchVal={setSearchVal} setPopupChannel={setPopupChannel}>
-                <h1>Create a channel</h1>
-              </ModalForm>
-            )
-          } */}
       </section>
       <section className="py-2">
         <div className="flex items-center py-1">
@@ -115,15 +106,6 @@ const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
           >
             Add Direct Messages
           </button>
-          {/* {
-            popupDirect &&  (
-            <div>
-              <h3>Create a direct chat</h3>
-              <p>Name</p>
-              <input type="text" value={channelName} onChange={(e) => setChannelName(e.target.value)}/>
-              <input type="submit" onClick={handleAddDirect}/>
-            </div>)
-          } */}
         </div>
       </section>
     </div>

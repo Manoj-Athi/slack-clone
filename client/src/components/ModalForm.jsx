@@ -96,9 +96,9 @@ const ModalForm = ({show, title, isGroupChannel, setModalState, usersList, cur, 
   }
 
   return (
-    <div className='h-full w-full py-12 bg-[#000000ba] transition duration-200 z-20 absolute top-0 right-0 bottom-0 left-0'>
+    <div className='h-full w-full py-12 bg-[#000000ba] transition duration-1000 delay-100 ease-in z-40 absolute top-0 right-0 bottom-0 left-0'>
       <div className='container mx-auto w-11/12 md:w-2/3 max-w-lg'>
-        <form className='relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400' onSubmit={ isGroupChannel ? handleSubmit : handleDirectSubmit}>
+        <form className='relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400 transition duration-1000 delay-100 ease-in' onSubmit={ isGroupChannel ? handleSubmit : handleDirectSubmit}>
             <h1 className='font-bold text-3xl py-3'>{title}</h1>
             { isGroupChannel && <p className=' py-3'>Name</p> }
             { isGroupChannel && <input className='w-full p-2 border' type="text" value={channelName} onChange={(e) => setChannelName(() => e.target.value)}/> }
