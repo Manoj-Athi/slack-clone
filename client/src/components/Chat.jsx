@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState} from 'react'
+import React, {useRef, useEffect, useState, useContext} from 'react'
 import moment from 'moment';
 
 import sliders from '../images/sliders-solid.svg'
@@ -10,14 +10,27 @@ import BeatLoader from "react-spinners/BeatLoader";
 import ChannelDesc from "./ChannelDesc";
 import ChannelEdit from './ChannelEdit';
 import ChannelDelete from './ChannelDelete';
+import { ModalContext } from '../Contexts/ModalContext';
 
 const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyping, handleSendMessage, userProfile, usersTyping }) => {
     
     const lastMessageRef = useRef(null)
     const [showSettings, setShowSettings] = useState(false)
     const [showViewDesc, setShowViewDesc] = useState(false)
-    const [showEdit, setShowEdit] = useState(false)
     const [showDelete, setShowDelete] = useState(false)
+    const { setModalState } = useContext(ModalContext);
+
+    const handleEditChannelModal = () => {
+        setModalState({
+          type: "SET_MODAL_DATA",
+          payload: {
+            show: true,
+            title: "Edit channel",
+            isGroupChannel: true,
+            currentChat: currentChat
+          },
+        });
+      };
 
     const isLastMsg = (message, index, allMessages) => {
         return (index < allMessages.length && message.sender._id !== allMessages[index+1]?.sender._id)
@@ -60,14 +73,13 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                             <div className="absolute z-20 right-12 top-36 mt-1 max-w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md">
                                 <div className="flex flex-col">
                                     <button onClick={() => setShowViewDesc(state => !state)} className='cursor-pointer transition hover:bg-[#f9ebfa] hover:border-[#4a154be6] hover:text-[#4a154be6] p-2'>{ currentChat?.isGroupChannel ? "View Channel Details" : "View Profile" }</button>
-                                    { currentChat?.isGroupChannel && <button onClick={() => setShowEdit(state => !state)} className='cursor-pointer transition hover:bg-[#f9ebfa] hover:border-[#4a154be6] hover:text-[#4a154be6] p-2'>Edit Channel</button> }
+                                    { currentChat?.isGroupChannel && <button onClick={handleEditChannelModal} className='cursor-pointer transition hover:bg-[#f9ebfa] hover:border-[#4a154be6] hover:text-[#4a154be6] p-2'>Edit Channel</button> }
                                     <button onClick={() => setShowDelete(state => !state)} className='cursor-pointer transition hover:bg-red-100 hover:border-red-600 hover:text-red-600 p-2'>Delete Channel</button>
                                 </div>
                             </div>
                         )
                     }
-                    { showViewDesc && <ChannelDesc currentChat={currentChat} setShowViewDesc={setShowViewDesc} setShowEdit={setShowEdit} setShowDelete={setShowDelete}/>}
-                    { showEdit && <ChannelEdit currentChat={currentChat} setShowEdit={setShowEdit}/>}
+                    { showViewDesc && <ChannelDesc currentChat={currentChat} setShowViewDesc={setShowViewDesc} handleEditChannelModal={handleEditChannelModal} setShowDelete={setShowDelete}/>}
                     { showDelete && <ChannelDelete currentChat={currentChat} setShowDelete={setShowDelete}/>}
                 </div>
                 <div className='px-5 py-4  h-[calc(100vh_-_250px)] flex flex-col overflow-y-scroll scroll-smooth'>
@@ -100,7 +112,7 @@ const Chat = ({ loading, allMessages, currentChat, message, setMessage,handleTyp
                                         </div>
                                         {
                                             isSendByUser(m) && (
-                                                <span class="absolute top-[-35px] left-0 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+                                                <span className="absolute top-[-35px] left-0 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
                                                     seen by {typeof m.isRead === "object" && m.isRead.length}
                                                 </span>
                                             )

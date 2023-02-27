@@ -7,8 +7,6 @@ const Sidebar = ({ workSpace, setCurrentChat, slideIn }) => {
   const [dropdownChannel, setDropdownChannel] = useState(true);
   const [dropdownDirect, setDropdownDirect] = useState(true);
   const { setModalState } = useContext(ModalContext);
-
-  // const user = useSelector((state) => state.UserReducer)
   const handleModal = () => {
     setModalState({
       type: "SET_MODAL_DATA",

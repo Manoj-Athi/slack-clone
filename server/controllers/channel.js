@@ -79,3 +79,32 @@ export const createDirectChannel = async (req, res) => {
 export const addUsersToChannel = async (req, res) => {
     // add user to channel
 }
+
+export const updateGroupChannel = async (req, res) => {
+    const { channelId, channelName, userId, users } = req.body;
+    try {
+        if(userId !== req.user._id.toString()){
+            throw new customException(401, 'Unauthorized user')
+        }
+        const newChannel = await Channel.updateOne({
+            _id: channelId
+        },{ 
+            $set: {
+                channelName: channelName,
+                users: users
+            }
+        })
+        if( !newChannel ){
+            throw new customException(400, 'Unable to fetch channels')
+        }
+        res.status(200).json({
+            status: 'SUCCESS',
+            message: 'Channel created',
+        })
+    } catch (error) {
+        return res.status(parseInt(error.code) || 400).json({
+            status: 'ERROR',
+            message: error.message
+        })
+    }
+}

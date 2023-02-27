@@ -3,11 +3,7 @@ import React from 'react'
 const DisplayUserList = ({ user, setMainCoworkerList }) => {
 
     const handleAddUser = () => {
-        // if(!setCoworkerList.includes(user?._id)){
-        //   setCoworkerList([ ...coworkerList, user?._id])
-        // }
-        // console.log(coworkerList)
-        setMainCoworkerList({ type: "ADD_USER", payload: { _id:user?._id, name:user?.name} })
+        setMainCoworkerList({ type: "ADD_USER", payload: user })
     }
 
   return (

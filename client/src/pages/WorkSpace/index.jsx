@@ -22,7 +22,7 @@ const modalReducer = (state, action) => {
 const WorkSpace = () => {
 	const [ currentChat, setCurrentChat ] = useState();
   const [slideIn, setSlideIn] = useState(false)
-  const [ ModalState, setModalState ] = useReducer(modalReducer, { show: false });
+  const [ ModalState, setModalState ] = useReducer(modalReducer, { show: false,  });
   
   const currentWorkSpace = useSelector((state) => state.CurrentWorkSpaceReducer);
   const user = useSelector((state) => state.UserReducer);
@@ -48,7 +48,7 @@ const WorkSpace = () => {
   return (
     <ModalContext.Provider value={ { ModalState, setModalState } }>
       <div className="min-h-screen w-full bg-gray-100 text-gray-700" x-data="layout">
-        <ModalForm {...ModalState} setModalState={setModalState} usersList={currentWorkSpace?.data?.users} workSpaceId={currentWorkSpace?.data?._id} cur={user?.data}/>
+        <ModalForm {...ModalState} setModalState={setModalState} usersList={currentWorkSpace?.data?.users} workSpaceId={currentWorkSpace?.data?._id} cur={user?.data} setCurrentChat={setCurrentChat}/>
         <Navbar workSpaceName={currentWorkSpace?.data?.workSpaceName} handleSlideIn={handleSlideIn} userProfile={user?.data} handleLogout={handleLogout} setCurrentChat={setCurrentChat}/>
         <div className='flex'>
           <Sidebar workSpace={currentWorkSpace?.data} setCurrentChat={setCurrentChat} slideIn={slideIn} />

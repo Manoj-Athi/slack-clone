@@ -32,11 +32,19 @@ export const createFirstChannel = ({ workSpaceId, channelName, userId, users, na
     navigate(`/workspace/${workSpaceName}`);
 }
 
-export const createGroupChannel = ({ workSpaceId, channelName, userId, users, navigate, workSpaceName }) => async(dispatch) => {
+export const createGroupChannel = ({ workSpaceId, channelName, userId, users }) => async(dispatch) => {
     const { data } = await axios.post('http://localhost:5000/chat/channel/create', { workSpaceId, userId, channelName, users }, {withCredentials: true})
     dispatch({ type: "SETUP_CHANNEL", payload: data?.data });
 }
+
 export const createDirectChannel = ({ workSpaceId, channelName, userId, users }) => async(dispatch) => {
     const { data } = await axios.post('http://localhost:5000/chat/channel/create-direct', { workSpaceId, userId, channelName, users }, {withCredentials: true})
     dispatch({ type: "SETUP_CHANNEL", payload: data?.data });
+}
+
+export const updateGroupChannel = ({ workSpaceId, channelId, channelName, users, userId }) => async (dispatch) => {
+    const { data } = await axios.post('http://localhost:5000/chat/channel/update', { channelId, userId, channelName, users }, {withCredentials: true})
+    if(data.status === "SUCCESS"){   
+        dispatch(selectWorkSpace({ workSpaceId }));
+    }
 }
